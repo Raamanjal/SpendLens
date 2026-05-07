@@ -23,9 +23,11 @@ export const TOOLS: Record<string, ToolDefinition> = {
         monthly: 40,
         perSeat: true,
       },
-       enterprise: {                           
-      label: 'Enterprise', monthly: null, perSeat: true,
-    },
+      enterprise: {                           
+      label: 'Enterprise', 
+      monthly: null, 
+      perSeat: true,
+      },
     },
   },
 
