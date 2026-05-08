@@ -41,6 +41,7 @@ export interface AuditInput {
 export interface PlanDefinition {
   label:    string;
   monthly:  number | null;   // null = custom/contact sales
+  annualMonthly?: number | null;
   perSeat:  boolean;
   minSeats?: number;
 }
