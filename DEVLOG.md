@@ -30,3 +30,4 @@ rule functions so each is independently testable.
 Build the full audit engine in src/lib/auditEngine.ts
 with at least 8 rule checks covering all major tools.
 Write 6+ Jest tests covering edge cases. No UI yet.
+
