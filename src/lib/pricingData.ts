@@ -64,7 +64,7 @@ export const TOOLS: Record<string, ToolDefinition> = {
       },
       pro: {
         label:   'Pro',
-        monthly: 20,
+        monthly: 17,
         perSeat: true,
       },
       max: {
@@ -72,10 +72,16 @@ export const TOOLS: Record<string, ToolDefinition> = {
         monthly: 100,
         perSeat: true,
       },
-      team: {
-        label:    'Team',
-        monthly:  30,
-        perSeat:  true,
+      team_standard: {
+        label: 'Team Standard',
+        monthly: 20,
+        perSeat: true,
+        minSeats: 5,
+      },
+      team_premium: {
+        label: 'Team Premium',
+        monthly: 100,
+        perSeat: true,
         minSeats: 5,
       },
       enterprise: {
@@ -94,32 +100,52 @@ export const TOOLS: Record<string, ToolDefinition> = {
   chatgpt: {
     label: 'ChatGPT',
     plans: {
-      free: {
-        label:   'Free',
-        monthly: 0,
-        perSeat: false,
-        // https://openai.com/chatgpt/pricing
+    free: {
+      label: 'free',
+      monthly: 0,
+      perSeat: true,
+    },
+    go: {
+      label: 'Go',
+      monthly: 5,
+      perSeat: true,
+    },
+
+    plus: {
+      label: 'Plus',
+      monthly: 20,
+      perSeat: true,
+    },
+
+    pro: {
+      label: 'Pro',
+      monthly: 120,
+      perSeat: true,
       },
-      plus: {
-        label:   'Plus',
-        monthly: 20,
+
+      business_chatgpt_codex: {
+        label: 'Business ChatGPT & Codex',
+        monthly: 21,
         perSeat: true,
-      },
-      team: {
-        label:    'Team',
-        monthly:  30,
-        perSeat:  true,
         minSeats: 2,
       },
+
+      business_codex: {
+        label: 'Business Codex',
+        monthly: null,
+        perSeat: false,
+      },
+
       enterprise: {
-        label:   'Enterprise',
+        label: 'Enterprise',
         monthly: null,
         perSeat: true,
       },
+
       api_direct: {
-        label: 'API Direct', 
-        monthly: null, 
-        perSeat: false, 
+        label: 'API Direct',
+        monthly: null,
+        perSeat: false,
       },
     },
   },
@@ -152,27 +178,28 @@ export const TOOLS: Record<string, ToolDefinition> = {
     label: 'Gemini',
     plans: {
       free: {
-        label:   'Free',
+        label: 'Free',
         monthly: 0,
         perSeat: false,
-        // https://one.google.com/about/plans
       },
+
       pro: {
-        label:   'Google One AI Premium',
+        label: 'Google AI Pro',
         monthly: 20,
         perSeat: true,
       },
-      ultra: { 
-        label: 'Ultra',
-        monthly: 30,
-        perSeat: true  
+
+      ultra: {
+        label: 'Google AI Ultra',
+        monthly: 300,
+        perSeat: true,
       },
+
       api: {
-        label:   'API (Pay-as-you-go)',
+        label: 'Gemini API (Pay-as-you-go)',
         monthly: null,
         perSeat: false,
       },
-      
     },
   },
 
