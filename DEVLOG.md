@@ -1,6 +1,16 @@
+## Day 1 - 2026-05-06
+**Hours worked:** 0
 
+**Reason**
+I was Busy at the Farewell of My College Seniors
 
-## Day 1 — 2026-05-08
+## Day 2 - 2026-05-07
+**Hours worked:** 0
+
+**Reason**
+I was Busy at the Farewell of My College Seniors
+
+## Day 3 - 2026-05-08
 
 **Hours worked:** 7
 
