@@ -64,7 +64,7 @@ export const TOOLS: Record<string, ToolDefinition> = {
       },
       pro: {
         label:   'Pro',
-        monthly: 17,
+        monthly: 20,
         perSeat: true,
       },
       max: {
