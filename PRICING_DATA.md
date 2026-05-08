@@ -43,7 +43,7 @@ https://claude.ai/upgrade
 ### Individual
 
 - Free: $0/month — verified 2026-05-08
-- Pro: $17/user/month — verified 2026-05-08
+- Pro: $20/user/month — verified 2026-05-08
 - Max: $100/user/month — verified 2026-05-08
 
 ### Team and Enterprise
