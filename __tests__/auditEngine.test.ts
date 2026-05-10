@@ -343,4 +343,61 @@ describe('auditAPISpend', () => {
     expect(result.perTool[0].recommendedAction).toBe('keep');
   });
 
+  // __tests__/auditEngine.test.ts — add to existing tests
+
+it('claude team standard recommends Pro plan', () => {
+  const result = runAudit({
+    tools: [{
+      tool: 'claude', plan: 'team_standard',
+      monthlySpend: 100, seats: 3,
+    }],
+    teamSize: 3, useCase: 'coding',
+  });
+  expect(result.perTool[0].recommendedPlan).toBe('Pro');
+});
+
+it('cursor business recommends Pro plan', () => {
+  const result = runAudit({
+    tools: [{
+      tool: 'cursor', plan: 'business',
+      monthlySpend: 80, seats: 2,
+    }],
+    teamSize: 2, useCase: 'coding',
+  });
+  expect(result.perTool[0].recommendedPlan).toBe('Pro');
+});
+
+it('github copilot enterprise recommends Business plan', () => {
+  const result = runAudit({
+    tools: [{
+      tool: 'github_copilot', plan: 'enterprise',
+      monthlySpend: 195, seats: 5,
+    }],
+    teamSize: 5, useCase: 'coding',
+  });
+  expect(result.perTool[0].recommendedPlan).toBe('Business');
+});
+
+it('chatgpt pro recommends Plus plan', () => {
+  const result = runAudit({
+    tools: [{
+      tool: 'chatgpt', plan: 'pro',
+      monthlySpend: 120, seats: 1,
+    }],
+    teamSize: 1, useCase: 'writing',
+  });
+  expect(result.perTool[0].recommendedPlan).toBe('Plus');
+});
+
+it('keep action has no recommended plan', () => {
+  const result = runAudit({
+    tools: [{
+      tool: 'cursor', plan: 'pro',
+      monthlySpend: 20, seats: 1,
+    }],
+    teamSize: 1, useCase: 'coding',
+  });
+  expect(result.perTool[0].recommendedPlan).toBeUndefined();
+});
+
 });
