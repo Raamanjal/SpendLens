@@ -19,12 +19,12 @@ const EMPTY_TOOL: ToolEntry = {
   tool:         '',
   plan:         '',
   monthlySpend: 0,
-  seats:        1,
+  seats:        '' as unknown as number, // Start empty for better UX
 };
 
 const INITIAL_FORM: AuditInput = {
   tools:    [{ ...EMPTY_TOOL }],
-  teamSize: 1,
+  teamSize: '' as unknown as number, // Start empty for better UX
   useCase:  'coding',
 };
 
@@ -78,7 +78,9 @@ export default function SpendForm({ onResult }: SpendFormProps) {
     e.preventDefault();
     setError('');
 
-    const validTools = formData.tools.filter(t => t.tool && t.plan);
+    const validTools = formData.tools
+      .filter(t => t.tool && t.plan)
+      .map(t => ({ ...t, seats: t.seats || 1 }));
     if (!validTools.length) {
       setError('Please add at least one tool with a plan selected.');
       return;
@@ -91,7 +93,7 @@ export default function SpendForm({ onResult }: SpendFormProps) {
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
           tools:    validTools,
-          teamSize: formData.teamSize,
+          teamSize: formData.teamSize || 1, // Fallback to 1 if left empty
           useCase:  formData.useCase,
           website:  '',            // honeypot — always empty for real users
         }),
@@ -127,42 +129,50 @@ export default function SpendForm({ onResult }: SpendFormProps) {
       />
 
       {/* Team context */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
             Team size
           </label>
           <input
             type="number"
             min="1"
-            value={formData.teamSize}
+            placeholder="e.g. 5"
+            value={formData.teamSize || ''}
             onChange={e => setFormData(f => ({
               ...f,
-              teamSize: parseInt(e.target.value) || 1,
+              teamSize: e.target.value === '' ? ('' as unknown as number) : parseInt(e.target.value) || 1,
             }))}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400
+                       focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all shadow-sm"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
             Primary use case
           </label>
-          <select
-            value={formData.useCase}
-            onChange={e => setFormData(f => ({
-              ...f,
-              useCase: e.target.value as UseCase,
-            }))}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
-          >
-            {USE_CASES.map(u => (
-              <option key={u.value} value={u.value}>{u.label}</option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={formData.useCase}
+              onChange={e => setFormData(f => ({
+                ...f,
+                useCase: e.target.value as UseCase,
+              }))}
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-900 appearance-none
+                         focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all shadow-sm cursor-pointer"
+            >
+              {USE_CASES.map(u => (
+                <option key={u.value} value={u.value}>{u.label}</option>
+              ))}
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </div>
         </div>
       </div>
+
+      <div className="h-px w-full bg-slate-100 my-6"></div>
 
       {/* Tool rows */}
       <div className="space-y-4">
@@ -180,37 +190,51 @@ export default function SpendForm({ onResult }: SpendFormProps) {
       </div>
 
       {/* Add tool button */}
-      <button
-        type="button"
-        onClick={addTool}
-        className="text-sm text-green-600 hover:text-green-700 font-medium
-                   flex items-center gap-1 transition-colors"
-      >
-        + Add another tool
-      </button>
+      <div className="pt-2">
+        <button
+          type="button"
+          onClick={addTool}
+          className="group flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors"
+        >
+          <svg className="w-4 h-4 transition-transform group-hover:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          Add another tool
+        </button>
+      </div>
 
       {/* Error message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm
-                        rounded-lg px-4 py-3">
+        <div className="bg-red-50 border border-red-200 text-red-600 text-sm
+                        rounded-lg px-4 py-3 flex items-center gap-3">
+          <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
           {error}
         </div>
       )}
 
       {/* Submit */}
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold
-                   py-3 px-6 rounded-lg transition-colors
-                   disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {loading ? 'Analysing your spend...' : 'Run Free Audit →'}
-      </button>
-
-      <p className="text-xs text-center text-gray-400">
-        Free forever · No login required · Results in seconds
-      </p>
+      <div className="pt-4">
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold
+                     py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2
+                     disabled:opacity-70 disabled:cursor-not-allowed shadow-sm"
+        >
+          {loading ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Analysing spend...
+            </>
+          ) : (
+            <>
+              Run Free Audit
+              <svg className="w-5 h-5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </>
+          )}
+        </button>
+      </div>
 
     </form>
   );
