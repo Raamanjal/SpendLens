@@ -1,21 +1,17 @@
 // src/components/ToolAuditCard.tsx
 import type { ToolAuditResult } from '@/types';
 
-// ── Config type defined inline ────────────────────────────
-// Avoids the Record<RecommendedAction, ...> generic
-// that Turbopack was misinterpreting as an expression
 type ActionConfig = {
   label:       string;
   badgeClass:  string;
   borderClass: string;
 };
 
-// ── Action config map ─────────────────────────────────────
 const ACTION_CONFIG: { [key: string]: ActionConfig } = {
   keep: {
     label:       'Optimal',
     badgeClass:  'bg-green-100 text-green-700',
-    borderClass: 'border-gray-200',
+    borderClass: 'border-slate-200',
   },
   downgrade: {
     label:       'Downgrade',
@@ -29,16 +25,15 @@ const ACTION_CONFIG: { [key: string]: ActionConfig } = {
   },
   optimize: {
     label:       'Optimize',
-    badgeClass:  'bg-purple-100 text-purple-700',
-    borderClass: 'border-purple-200',
+    badgeClass:  'bg-brand-100 text-brand-700',
+    borderClass: 'border-brand-200',
   },
 };
 
-// ── Fallback for unknown actions ──────────────────────────
 const DEFAULT_CONFIG: ActionConfig = {
   label:       'Review',
-  badgeClass:  'bg-gray-100 text-gray-700',
-  borderClass: 'border-gray-200',
+  badgeClass:  'bg-slate-100 text-slate-700',
+  borderClass: 'border-slate-200',
 };
 
 interface ToolAuditCardProps {
@@ -46,46 +41,52 @@ interface ToolAuditCardProps {
 }
 
 export default function ToolAuditCard({ tool }: ToolAuditCardProps) {
-
-  // Safe lookup — falls back to DEFAULT_CONFIG if key missing
   const config = ACTION_CONFIG[tool.recommendedAction] ?? DEFAULT_CONFIG;
 
   return (
-    <div className={`border ${config.borderClass} rounded-xl p-5 bg-white`}>
+    <div className={`border ${config.borderClass} bg-white rounded-xl p-5 md:p-6 shadow-sm`}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3">
 
-      {/* ── Header row ──────────────────────────────── */}
-      <div className="flex items-start justify-between gap-4 mb-3">
-
-        {/* Left: tool name, plan, seats, badge */}
-        <div className="flex items-center gap-2 flex-wrap min-w-0">
-          <span className="font-semibold text-gray-900">
-            {tool.tool}
-          </span>
-          <span className="text-gray-300">·</span>
-          <span className="text-gray-500 text-sm">
-            {tool.plan}
-          </span>
-          {tool.seats > 1 && (
-            <>
-              <span className="text-gray-300">·</span>
-              <span className="text-gray-500 text-sm">
-                {tool.seats} seats
-              </span>
-            </>
-          )}
-          <span className={`text-xs font-medium px-2 py-0.5
-                            rounded-full ${config.badgeClass}`}>
-            {config.label}
-          </span>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 flex-wrap min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-slate-900 text-lg tracking-tight">
+              {tool.tool}
+            </span>
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${config.badgeClass}`}>
+              {config.label}
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <span className="hidden sm:inline text-slate-300">|</span>
+            <span className="font-medium bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
+              {tool.plan}
+            </span>
+            {tool.seats > 1 && (
+              <>
+                <span className="text-slate-300">·</span>
+                <span className="flex items-center gap-1.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  {tool.seats}
+                </span>
+              </>
+            )}
+          </div>
         </div>
 
-        {/* Right: spend + saving */}
-        <div className="text-right shrink-0">
-          <p className="text-gray-400 text-sm line-through">
-            ${tool.currentSpend.toLocaleString()}/mo
-          </p>
+        <div className="text-left sm:text-right flex flex-col items-start sm:items-end">
+          <div className="flex items-center gap-2">
+            <span className="text-slate-400 text-sm line-through decoration-slate-300">
+              ${tool.currentSpend.toLocaleString()}/mo
+            </span>
+            <span className="text-slate-900 font-bold">
+              ${(tool.currentSpend - tool.potentialSaving).toLocaleString()}/mo
+            </span>
+          </div>
+          
           {tool.potentialSaving > 0 && (
-            <p className="text-green-600 font-semibold text-sm">
+            <p className="text-brand-600 font-semibold text-sm mt-0.5 flex items-center gap-1 bg-brand-50 px-2 py-0.5 rounded border border-brand-100">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
               Save ${tool.potentialSaving.toLocaleString()}/mo
             </p>
           )}
@@ -93,8 +94,7 @@ export default function ToolAuditCard({ tool }: ToolAuditCardProps) {
 
       </div>
 
-      {/* ── Reason ──────────────────────────────────── */}
-      <p className="text-sm text-gray-600 leading-relaxed">
+      <p className="text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3 mt-2">
         {tool.reason}
       </p>
 

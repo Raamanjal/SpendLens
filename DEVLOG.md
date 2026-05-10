@@ -93,3 +93,91 @@ reloads. No API calls yet — just the form rendering
 correctly with all 8 tools, their plans populating
 dynamically, and validation before submission.
 
+## Day 5 — 2026-05-10
+
+**Hours worked:** 13
+
+**What I did:**
+Built the complete form UI and results layer in one session.
+
+For the form: wrote useFormPersist.ts — a generic hook that
+reads from localStorage after mount using a hydrated boolean
+flag to prevent SSR mismatch, then writes on every state
+change. ToolRow.tsx — single form row with tool selector,
+dynamic plan selector that populates from pricingData based
+on the selected tool, monthly spend input with dollar prefix,
+and seats counter. Plan selector resets automatically when
+tool changes to prevent stale plan keys being submitted.
+SpendForm.tsx — manages the full list of tool rows, filters
+incomplete rows before submitting, handles add/remove/update,
+and calls /api/audit. Honeypot hidden field added for bot
+detection. page.tsx — landing page with hero section and a
+single state toggle between form view and results view.
+
+For the results and API layer: gemini.ts calls Gemini 1.5
+Flash with a structured prompt that injects real audit
+numbers using a financial advisor persona with explicit rules
+against markdown output — this fixed early versions that
+returned bullet points instead of a paragraph. Has a
+deterministic fallback that runs if the API fails for any
+reason so the audit never crashes. /api/audit receives form
+data, runs the audit engine, calls Gemini, generates a UUID
+with Node crypto, and returns JSON. In-memory rate limiter
+keyed by IP with a 1-hour rolling window. /api/lead validates
+email format and logs the capture — Supabase and Resend wired
+on Day 5. AuditResults renders the hero savings number, AI
+summary, per-tool breakdown cards, Credex CTA for savings
+above $500, and a lead capture form that switches to a share
+button on submission. ToolAuditCard maps each action type to
+badge colour and card background using a plain string key
+config object. LeadCapture and ShareButton completed.
+layout.tsx updated with default OG metadata and Geist font.
+Did a full UI redesign after the initial layout looked rough —
+replaced it with a cleaner green-on-white design with proper
+card hierarchy and spacing.
+
+Fixed 19 ESLint errors by adding browser and Node globals to
+the flat ESLint config and replacing all React.X namespace
+references with direct named imports. Also spent time
+debugging Turbopack parse failures caused by Unicode
+characters in JSX text — arrow symbols and HTML entities like
+&apos; caused build errors that only appeared at runtime. Fix
+was to wrap special characters in JSX expression syntax or
+remove them. Fixed a missing useState declaration in
+AuditResults that TypeScript surfaced as Cannot find name
+leadCaptured — the use client directive must be the absolute
+first line with no comments above it.
+
+**What I learned:**
+The hydration pattern with a boolean flag is the correct way
+to use localStorage in Next.js App Router — without it the
+server renders with the initial value and the client
+immediately re-renders causing a hydration mismatch crash.
+Turbopack in Next.js 16 is stricter about Unicode characters
+in JSX than the Webpack bundler was — plain text or JS string
+expressions are safer than HTML entities or raw Unicode
+arrows. Gemini returns an empty string rather than throwing
+when the prompt produces no output — needed an explicit check
+before triggering the fallback. Next.js 15 params in dynamic
+routes is now a Promise and must be awaited — destructuring
+directly caused a TypeScript error. Record with a union type
+generic is misinterpreted by Turbopack when the union comes
+from an import type — a plain string index signature fixes it.
+React namespace usage triggers no-undef ESLint errors in flat
+config — named imports are the correct approach anyway.
+
+**Blockers / what I'm stuck on:**
+The shareable /audit/[id] page shows a placeholder until
+Supabase is connected on Day 5. Lead capture logs to console
+instead of saving to a database. The in-memory rate limiter
+resets on cold start which is acceptable for MVP but would
+need Upstash Redis for production persistence. Spent more
+time than expected on Turbopack parse errors and ESLint
+configuration — both are now fully resolved.
+
+**Plan for tomorrow:**
+Set up Supabase — create audits and leads tables, wire service
+client into /api/audit to persist results, wire into /api/lead
+to save email captures, and fetch real data in /audit/[id] so
+the shareable URL works end to end. Set up Resend to send a
+transactional confirmation email on lead capture.

@@ -1,14 +1,16 @@
+// Displays the full results of the audit
+// Contains: high-level summary, AI analysis block, and tool-by-tool cards
 'use client';
 
-import { useState } from 'react';
-import ToolAuditCard from './ToolAuditCard';
-import LeadCapture from './LeadCapture';
-import ShareButton from './ShareButton';
+import { useState }      from 'react';
 import type { AuditResult } from '@/types';
+import ToolAuditCard     from './ToolAuditCard';
+import LeadCapture       from './LeadCapture';
+import ShareButton       from './ShareButton';
 
 interface AuditResultsProps {
   auditId: string;
-  result: AuditResult;
+  result:  AuditResult;
   summary: string;
 }
 
@@ -17,96 +19,104 @@ export default function AuditResults({
   result,
   summary,
 }: AuditResultsProps) {
-  const [leadCaptured, setLeadCaptured] = useState<boolean>(false);
+  
+  const [captured, setCaptured] = useState(false);
 
-  const heroColor =
-    result.totalMonthlySaving > 100
-      ? 'text-green-600'
-      : result.totalMonthlySaving > 0
-      ? 'text-yellow-600'
-      : 'text-blue-600';
+  const hasSavings  = result.totalMonthlySaving > 0;
+  const highSavings = result.totalMonthlySaving > 100;
+  const isOptimal   = !hasSavings;
 
   return (
-    <div className="space-y-8">
-
-      <div className="text-center py-12 bg-linear-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-100">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
+    <div className="space-y-8 animate-fade-in-up">
+      
+      {/* ── 1. Hero Savings Dashboard ──────────────────────── */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden text-center p-10 relative">
+        <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">
           Potential Monthly Savings
-        </p>
-        <p className={`text-7xl font-bold tabular-nums ${heroColor}`}>
-          {'$'}{result.totalMonthlySaving.toLocaleString()}
-        </p>
-        <p className="text-gray-400 text-base mt-2">
-          {'$'}{result.totalAnnualSaving.toLocaleString()}{' per year'}
-        </p>
-        {result.isAlreadyOptimal && (
-          <span className="inline-block mt-5 bg-green-100 text-green-800 text-sm font-medium px-4 py-2 rounded-full">
-            You are already spending well.
-          </span>
+        </h2>
+        
+        {hasSavings ? (
+          <div className="mb-2">
+            <span className="text-6xl md:text-8xl font-extrabold text-slate-900 tracking-tighter">
+              ${result.totalMonthlySaving.toLocaleString()}
+            </span>
+          </div>
+        ) : (
+          <div className="mb-2">
+            <span className="text-5xl md:text-6xl font-extrabold text-brand-600 tracking-tighter">
+              Optimal Setup
+            </span>
+          </div>
+        )}
+
+        {hasSavings && (
+          <div className="inline-block bg-green-50 text-green-700 font-semibold px-4 py-1.5 rounded-full border border-green-200 text-sm mt-4">
+            ${(result.totalMonthlySaving * 12).toLocaleString()} per year
+          </div>
         )}
       </div>
 
-      {summary && (
-        <div className="bg-blue-50 border-l-4 border-blue-400 rounded-r-xl p-5">
-          <p className="text-xs font-semibold text-blue-500 uppercase tracking-wide mb-2">
-            AI Analysis
-          </p>
-          <p className="text-gray-700 text-sm leading-relaxed">
-            {summary}
-          </p>
+      {/* ── 2. AI Analysis Summary ─────────────────────────── */}
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 relative overflow-hidden">
+        <div className="flex items-start gap-4 relative z-10">
+          <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 shrink-0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          </div>
+          <div>
+            <h3 className="font-bold text-slate-900 text-sm tracking-wider uppercase mb-2">
+              AI Analysis
+            </h3>
+            <p className="text-slate-700 leading-relaxed text-sm md:text-base">
+              {summary}
+            </p>
+          </div>
         </div>
-      )}
+      </div>
 
-      <div>
-        <h2 className="text-base font-semibold text-gray-900 mb-3">
-          Per-Tool Breakdown
-        </h2>
-        <div className="space-y-3">
-          {result.perTool.map((tool, i) => (
-            <ToolAuditCard key={i} tool={tool} />
+      {/* ── 3. Per-Tool Breakdown ──────────────────────────── */}
+      <div className="relative">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="h-px bg-slate-200 flex-grow"></div>
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+            Per-Tool Breakdown
+          </h3>
+          <div className="h-px bg-slate-200 flex-grow"></div>
+        </div>
+
+        <div className="space-y-4 relative z-10">
+          {result.perTool.map((tool, idx) => (
+            <ToolAuditCard key={idx} tool={tool} />
           ))}
         </div>
       </div>
 
-      {result.isHighSavings && (
-        <div className="bg-gray-900 text-white rounded-2xl p-8">
-          <p className="text-2xl font-bold mb-2 leading-tight">
-            {'You are leaving $'}{result.totalAnnualSaving.toLocaleString()}{' per year on the table.'}
-          </p>
-          <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-            Credex sources discounted AI credits from companies that over-forecast.
-            Our team can help you capture even more savings beyond this audit.
-          </p>
-          
-          {/* <div> */}
-            <a
-            href="https://credex.rocks/consult"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-green-500 hover:bg-green-400 text-white font-semibold px-6 py-3 rounded-lg transition-colors">
-            Book a Free Credex Consultation
-          </a>
-        </div>
-      )}
-
-      <div className="border-t border-gray-100 pt-6 space-y-4">
-        {leadCaptured === false ? (
-          <LeadCapture
-            auditId={auditId}
-            monthlySaving={result.totalMonthlySaving}
-            isHighSavings={result.isHighSavings}
-            isOptimal={result.isAlreadyOptimal}
-            onCapture={() => setLeadCaptured(true)}
-          />
-        ) : (
-          <div className="space-y-4">
-            <p className="text-green-600 text-sm font-medium">
-              Report sent to your email.
-            </p>
-            <ShareButton
+      {/* ── 4. Lead Capture / Upsell / Share ───────────────── */}
+      <div className="mt-12">
+        {!captured ? (
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm">
+            <LeadCapture
               auditId={auditId}
-              saving={result.totalMonthlySaving}
+              monthlySaving={result.totalMonthlySaving}
+              isHighSavings={highSavings}
+              isOptimal={isOptimal}
+              onCapture={() => setCaptured(true)}
             />
+          </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 text-center shadow-sm animate-fade-in-up">
+            <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">
+              Report Sent!
+            </h3>
+            <p className="text-slate-600 mb-8 max-w-md mx-auto">
+              Check your inbox for the full breakdown. In the meantime, share this audit with your team.
+            </p>
+            
+            <div className="max-w-md mx-auto bg-white border border-slate-200 rounded-xl p-4 text-left shadow-sm">
+              <ShareButton auditId={auditId} saving={result.totalMonthlySaving} />
+            </div>
           </div>
         )}
       </div>

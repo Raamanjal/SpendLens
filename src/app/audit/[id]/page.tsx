@@ -41,36 +41,42 @@ export default async function AuditPage({ params }: PageProps) {
   // Then render: <AuditResults result={audit.result} ... />
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="flex-grow flex flex-col relative w-full bg-slate-50 min-h-screen">
 
-      <nav className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-3xl mx-auto">
-          <span className="font-bold text-xl text-green-600">
-            SpendLens
-          </span>
+      <nav className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-50 transition-all duration-300">
+        <div className="max-w-4xl mx-auto flex items-center justify-center">
+          <Link href="/" className="flex items-center gap-2 group">
+            <span className="font-extrabold text-2xl tracking-tight text-slate-900 group-hover:text-slate-700 transition-colors">
+              SpendLens
+            </span>
+          </Link>
         </div>
       </nav>
 
-      <div className="max-w-3xl mx-auto px-6 py-16 text-center">
-        <p className="text-xs font-semibold text-gray-400
-                      uppercase tracking-widest mb-4">
-          Audit ID: {id}
-        </p>
-        <h1 className="text-2xl font-bold text-gray-900 mb-3">
-          Shared Audit Report
-        </h1>
-        <p className="text-gray-500 text-sm mb-8">
-          Full shareable results will be wired up on Day 5
-          when Supabase is connected.
-        </p>
-        <Link
-          href="/"
-          className="inline-block bg-green-600 hover:bg-green-700
-                     text-white font-semibold px-6 py-3 rounded-lg
-                     transition-colors"
-        >
-          Run Your Own Audit →
-        </Link>
+      <div className="max-w-3xl w-full mx-auto px-6 py-20 md:py-32 flex-grow flex flex-col items-center justify-center text-center animate-fade-in-up">
+        <div className="bg-white rounded-3xl p-1 shadow-xl border border-slate-200 relative w-full">
+          <div className="relative bg-white rounded-[23px] p-8 md:p-16">
+            <div className="w-16 h-16 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 border border-brand-100 mx-auto mb-6">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+              Audit ID: {id}
+            </p>
+            <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">
+              Shared Audit Report
+            </h1>
+            <p className="text-lg text-slate-600 mb-10 max-w-lg mx-auto">
+              Full shareable results will be wired up on Day 5 when Supabase is connected.
+            </p>
+            <Link
+              href="/"
+              className="group relative inline-flex items-center justify-center bg-slate-900 text-white font-bold px-8 py-4 rounded-xl transition-all hover:bg-slate-800 hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
+            >
+              Run Your Own Free Audit
+              <svg className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </Link>
+          </div>
+        </div>
       </div>
 
     </main>

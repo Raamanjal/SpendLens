@@ -11,6 +11,7 @@ const geist = Geist({ subsets: ['latin'] });
 // ─── 2. Default metadata ─────────────────────────────────
 // Applied to every page unless overridden by generateMetadata
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   title:       'SpendLens — Free AI Spend Audit',
   description: 'Find out where your team is overspending on AI tools. Free audit in seconds.',
   openGraph: {
@@ -37,7 +38,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={geist.className}>
+      <body className={`${geist.className} bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col`}>
         {children}
       </body>
     </html>
