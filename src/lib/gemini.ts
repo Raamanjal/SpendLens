@@ -5,7 +5,7 @@ import type { AuditResult, AuditInput } from '@/types';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? '');
 
-const MODEL = 'gemini-1.5-flash';
+const MODEL = 'gemini-2.5-flash';
 
 // ─── 3. Main exported function ────────────────────────────
 // Called from the /api/audit route after the audit engine runs
