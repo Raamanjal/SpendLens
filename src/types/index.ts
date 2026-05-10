@@ -58,6 +58,8 @@ export interface ToolAuditResult {
   seats:             number;
   currentSpend:      number;
   recommendedAction: RecommendedAction;
+  recommendedPlan?:  string;         // ← add this — suggested plan label
+  recommendedPrice?: number | null;  // ← add this — price of suggested plan
   potentialSaving:   number;
   reason:            string;         // 1 sentence, finance-literate
 }
