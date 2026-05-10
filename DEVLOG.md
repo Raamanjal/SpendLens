@@ -181,3 +181,4 @@ client into /api/audit to persist results, wire into /api/lead
 to save email captures, and fetch real data in /audit/[id] so
 the shareable URL works end to end. Set up Resend to send a
 transactional confirmation email on lead capture.
+
