@@ -182,3 +182,49 @@ to save email captures, and fetch real data in /audit/[id] so
 the shareable URL works end to end. Set up Resend to send a
 transactional confirmation email on lead capture.
 
+## Day 6 — 2026-05-11
+
+**Hours worked:** 10
+
+**What I did:**
+Wired up the full backend. Created Supabase project, ran
+SQL schema for audits and leads tables with RLS enabled.
+Built supabase.ts with service and browser clients. Updated
+/api/audit to save results to Supabase with a fallback UUID
+if the insert fails. Updated /api/lead to save email
+captures. Updated /audit/[id]/page.tsx to fetch real data
+from Supabase with dynamic OG metadata showing the actual
+saving amount. Added not-found.tsx for missing audit IDs.
+
+Extended the audit engine with a recommendedPlan feature —
+added recommendedPlanKey parameter to makeResult in the
+format toolKey:planKey which resolves the plan label and
+price from pricingData. Updated all 8 tool rule functions
+to pass the correct recommended plan. Updated ToolAuditCard
+to show a green pill displaying the exact plan to switch to.
+Added 5 new Jest tests covering recommendedPlan assertions.
+
+Set up Resend account and built the full HTML email template
+with savings hero, view audit CTA, and Credex CTA for high
+savings users.
+
+**What I learned:**
+Supabase RLS is off by default — must be explicitly enabled
+per table. Service role key bypasses RLS entirely so it must
+never be a NEXT_PUBLIC_ variable. The recommendedPlanKey
+string format keeps rule functions clean — makeResult
+resolves label and price from pricingData in one place.
+
+**Blockers / what I'm stuck on:**
+Resend email not working. Two errors hit during debugging —
+first the SDK returned application_error with null statusCode
+meaning api.resend.com was unreachable. After generating a
+new API key the error changed to 401 API key is invalid.
+Lead capture saves to Supabase correctly but email is not
+being sent.
+
+**Plan for tomorrow:**
+Fix Resend — verify new key with direct curl before testing
+through the app, check Resend dashboard for account flags.
+If unresolvable, move on to CI setup, Vercel deployment,
+Lighthouse audit, and all remaining markdown files.
