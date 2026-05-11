@@ -31,6 +31,6 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts",
      "__tests__/**/*.ts"  
-  ],
+, "jest.config.js"  ],
   "exclude": ["node_modules"]
 }
