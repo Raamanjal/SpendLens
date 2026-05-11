@@ -201,15 +201,17 @@ export default function SpendForm({ onResult }: SpendFormProps) {
         </button>
       </div>
 
-      {/* Error message */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 text-sm
-                        rounded-lg px-4 py-3 flex items-center gap-3">
-          <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-          {error}
-        </div>
-      )}
-
+     {/* Replace the error div with this */}
+{error && (
+  <div
+    role="alert"
+    aria-live="polite"
+    className="bg-red-50 border border-red-100 text-red-600
+               text-sm rounded-lg px-4 py-3"
+  >
+    {error}
+  </div>
+)}
       {/* Submit */}
       <div className="pt-4">
         <button

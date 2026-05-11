@@ -127,10 +127,12 @@ export default function LeadCapture({
           />
         </div>
 
-        {/* Error message */}
-        {error && (
-          <p className="text-red-600 text-sm bg-red-50 px-4 py-2 rounded-lg border border-red-100 inline-block">{error}</p>
-        )}
+        {/*Error */}
+{error && (
+  <p role="alert" aria-live="polite" className="text-red-500 text-xs">
+    {error}
+  </p>
+)}
 
         <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
           {/* Submit — label changes based on savings level */}
