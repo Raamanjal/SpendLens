@@ -228,3 +228,27 @@ Fix Resend — verify new key with direct curl before testing
 through the app, check Resend dashboard for account flags.
 If unresolvable, move on to CI setup, Vercel deployment,
 Lighthouse audit, and all remaining markdown files.
+
+
+## Day 7 — 2026-05-12
+**Hours worked:** 12
+
+**What I did:**
+Fixed Resend email integration after discovering the API key in .env.local was truncated during paste. Verified the key manually using a PowerShell curl request before testing through the app. After updating the full key, Resend returned successful responses and emails were delivered correctly. Removed all debug logging from resend.ts.
+
+Set up GitHub Actions CI and resolved multiple issues. Converted jest.config.ts to jest.config.js because CI could not parse TypeScript config files without ts-node. Updated the config to use the new Jest transform syntax instead of deprecated globals. Fixed the “multiple configurations found” error by removing the tracked jest.config.ts using git rm. Updated the GitHub Actions workflow from Node.js 20 to 22 to remove deprecation warnings. CI now passes all checks.
+
+Deployed the app to Vercel
+ successfully on the first build. Added all environment variables and improved Lighthouse scores by adding security headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy) in next.config.ts. Improved accessibility with proper aria-label, htmlFor, role="alert", and aria-live usage. Generated a 1200x630 Open Graph image for social previews.
+
+Completed all remaining markdown documentation files including README, ARCHITECTURE, REFLECTION, TESTS, GTM, ECONOMICS, LANDING_COPY, METRICS, and USER_INTERVIEWS. Added a Mermaid architecture diagram, scaling plan, growth strategy, conversion funnel math, ARR projections, and pivot triggers.
+
+Conducted 3 user interviews with developers and students using multiple AI subscriptions. A key insight was that users react more strongly to annual cost framing compared to monthly pricing, which influenced the decision to highlight yearly savings prominently in the results UI.
+
+**What I learned:**
+Jest TypeScript configs require ts-node in CI, so converting to JavaScript avoids extra dependencies. git rm is necessary to stop Git from tracking deleted files. Vercel
+ auto-detects Next.js configuration, reducing deployment setup work. User interviews revealed that subscription inertia is often a stronger factor than actual product value in keeping AI tool subscriptions active.
+
+**Blockers / what I'm stuck on:**
+No blockers. CI passing, deployment live, Resend working, documentation completed.
+
