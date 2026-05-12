@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SpendLens — Free AI Spend Audit
 
-## Getting Started
+SpendLens audits your team's AI tool subscriptions and 
+tells you exactly where you're overspending. Built as a 
+lead generation tool for Credex, which sells discounted 
+AI credits.
 
-First, run the development server:
+**Live URL:** http://spend-lens-eta.vercel.app/
+
+---
+
+## Screenshots
+
+
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
+
+
+
+---
+
+## Quick Start
+
+### Install
+
+```bash
+git clone https://github.com/Raamanjal/SpendLens.git
+cd spendlens
+npm install
+```
+
+### Environment Variables
+
+Copy `.env.example` to `.env.local` and fill in:
+
+```bash
+cp .env.example .env.local
+```
+
+Required keys:
+- `NEXT_PUBLIC_SUPABASE_URL` — from supabase.com
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — from supabase.com
+- `SUPABASE_SERVICE_ROLE_KEY` — from supabase.com
+- `GEMINI_API_KEY` — from aistudio.google.com
+- `RESEND_API_KEY` — from resend.com
+- `NEXT_PUBLIC_BASE_URL` — your deployed URL
+
+### Run Locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Run Tests
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm test
+```
 
-## Learn More
+### Deploy
 
-To learn more about Next.js, take a look at the following resources:
+Connect repo to Vercel. Add environment variables 
+in dashboard. Deploy.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Decisions
 
-## Deploy on Vercel
+**1. Next.js App Router over Pages Router**
+App Router gives server components, streaming, and 
+built-in OG metadata generation. The shareable audit 
+page needed server-side data fetching for OG tags to 
+work correctly on social media — App Router handles 
+this cleanly.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**2. Audit engine as pure functions, not AI**
+The audit logic is hardcoded rules, not an LLM. A 
+finance-literate person needs to agree with every 
+recommendation. Hardcoded rules are deterministic, 
+testable, and defensible. AI is only used for the 
+summary paragraph where imprecision is acceptable.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**3. Gemini 1.5 Flash over Anthropic for summary**
+Gemini Flash is faster and cheaper for a ~100 word 
+summary task. The summary is cosmetic — it wraps 
+real audit numbers in readable prose. Pro-level 
+reasoning is unnecessary here.
+
+**4. Supabase over a custom Postgres**
+Free tier, no infrastructure to manage, built-in RLS 
+for lead data privacy, and a JS SDK that works cleanly 
+in Next.js API routes. For an MVP processing under 
+1000 audits/day this is more than sufficient.
+
+**5. Form state in localStorage, not URL params**
+URL params for a multi-tool form with 4 fields per 
+row becomes unwieldy. localStorage is simpler, 
+survives refreshes, and the data never needs to be 
+shareable — only the result page is shared.
