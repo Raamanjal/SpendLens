@@ -41,6 +41,7 @@ export default function SpendForm({ onResult }: SpendFormProps) {
     'spendlens-form',
     INITIAL_FORM
   );
+  const [email,   setEmail]   = useState('');
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState('');
 
@@ -86,6 +87,11 @@ export default function SpendForm({ onResult }: SpendFormProps) {
       return;
     }
 
+    if (!email) {
+      setError('Please enter your email so pricing-change alerts can reach you.');
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch('/api/audit', {
@@ -95,6 +101,7 @@ export default function SpendForm({ onResult }: SpendFormProps) {
           tools:    validTools,
           teamSize: formData.teamSize || 1, // Fallback to 1 if left empty
           useCase:  formData.useCase,
+          email,
           website:  '',            // honeypot — always empty for real users
         }),
       });
@@ -129,7 +136,20 @@ export default function SpendForm({ onResult }: SpendFormProps) {
       />
 
       {/* Team context */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
+            Email
+          </label>
+          <input
+            type="email"
+            placeholder="you@company.com"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400
+                       focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all shadow-sm"
+          />
+        </div>
         <div className="space-y-1.5">
           <label className="block text-sm font-semibold text-slate-700">
             Team size
