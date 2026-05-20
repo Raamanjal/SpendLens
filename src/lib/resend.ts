@@ -10,6 +10,17 @@ interface SendAuditEmailParams {
   isHighSavings: boolean;
 }
 
+interface SendPricingChangeEmailParams {
+  email: string;
+  affectedAudits: {
+    auditId: string;
+    changes: string[];
+    oldMonthlySaving: number;
+    newMonthlySaving: number;
+    monthlyDelta: number;
+  }[];
+}
+
 export async function sendAuditEmail({
   email,
   monthlySaving,
@@ -60,6 +71,32 @@ export async function sendAuditEmail({
   } catch (err) {
     console.error('Resend threw an exception:', (err as Error).message);
     console.error('Full error:', err);
+  }
+}
+
+export async function sendPricingChangeEmail({
+  email,
+  affectedAudits,
+}: SendPricingChangeEmailParams): Promise<void> {
+  if (!affectedAudits.length) return;
+
+  const subject = affectedAudits.length === 1
+    ? 'SpendLens pricing change detected for your audit'
+    : `SpendLens pricing changes detected for ${affectedAudits.length} audits`;
+
+  try {
+    const response = await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: email,
+      subject,
+      html: buildPricingChangeEmailHtml({ email, affectedAudits }),
+    });
+
+    if (response.error) {
+      console.error('Pricing-change email failed:', response.error);
+    }
+  } catch (err) {
+    console.error('Pricing-change email threw:', (err as Error).message);
   }
 }
 
@@ -183,4 +220,76 @@ function buildEmailHtml({
     </body>
     </html>
   `;
+}
+
+function buildPricingChangeEmailHtml({
+  affectedAudits,
+}: SendPricingChangeEmailParams): string {
+  const items = affectedAudits.map(audit => {
+    const diffUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/audit/${audit.auditId}/reaudit`;
+    const changeList = audit.changes
+      .map(change => `<li style="margin-bottom:6px;">${escapeHtml(change)}</li>`)
+      .join('');
+    const deltaText = audit.monthlyDelta === 0
+      ? 'No total savings change'
+      : `${audit.monthlyDelta > 0 ? '+' : ''}$${audit.monthlyDelta.toLocaleString()}/mo savings delta`;
+
+    return `
+      <div style="border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin-bottom:16px;">
+        <p style="margin:0 0 8px;color:#111827;font-weight:700;">
+          Audit ${audit.auditId.slice(0, 8)}
+        </p>
+        <p style="margin:0 0 12px;color:#4b5563;font-size:14px;">
+          Previous recommendation: $${audit.oldMonthlySaving.toLocaleString()}/mo savings<br />
+          Current recommendation: $${audit.newMonthlySaving.toLocaleString()}/mo savings<br />
+          <strong>${deltaText}</strong>
+        </p>
+        <ul style="color:#4b5563;font-size:14px;padding-left:20px;margin:0 0 16px;">
+          ${changeList}
+        </ul>
+        <a href="${diffUrl}"
+           style="display:inline-block;background:#16a34a;color:white;
+                  font-weight:600;font-size:14px;padding:10px 18px;
+                  border-radius:8px;text-decoration:none;">
+          View before/after diff
+        </a>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </head>
+    <body style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+                 background:#f9fafb;margin:0;padding:40px 20px;">
+      <div style="max-width:560px;margin:0 auto;background:white;
+                  border-radius:12px;border:1px solid #e5e7eb;padding:32px;">
+        <h1 style="color:#111827;margin:0 0 8px;font-size:22px;">
+          Pricing changed. Your audit may have changed too.
+        </h1>
+        <p style="color:#4b5563;font-size:15px;line-height:1.6;margin:0 0 24px;">
+          SpendLens re-checked your stored audit against the latest pricing data.
+          Here is what changed and how it affects the original recommendation.
+        </p>
+        ${items}
+        <p style="color:#9ca3af;font-size:12px;margin:24px 0 0;">
+          SpendLens by Credex
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }

@@ -51,6 +51,13 @@ export interface ToolDefinition {
   plans: Record<string, PlanDefinition>;
 }
 
+/** Frozen copy of pricingData saved on each audit (Round 2). */
+export interface PricingSnapshot {
+  version:     1;
+  capturedAt: string;
+  tools:       Record<string, ToolDefinition>;
+}
+
 // ── Audit engine output ───────────────────────────────────
 export interface ToolAuditResult {
   tool:              string;         // human-readable label
@@ -79,6 +86,7 @@ export interface AuditRequestBody {
   tools:    ToolEntry[];
   teamSize: number;
   useCase:  UseCase;
+  email?:   string;
   website:  string;           // honeypot — must be empty
 }
 
@@ -86,6 +94,7 @@ export interface AuditResponse {
   auditId: string;
   result:  AuditResult;
   summary: string;
+  email?:  string;
 }
 
 export interface LeadRequestBody {
@@ -100,11 +109,13 @@ export interface LeadRequestBody {
 
 // ── Database row shapes ───────────────────────────────────
 export interface AuditRow {
-  id:         string;
-  input:      AuditInput;
-  result:     AuditResult;
-  summary:    string;
-  created_at: string;
+  id:               string;
+  input:            AuditInput;
+  result:           AuditResult;
+  summary:          string;
+  user_email?:      string | null;
+  pricing_snapshot: PricingSnapshot | null;
+  created_at:       string;
 }
 
 export interface LeadRow {
@@ -116,4 +127,42 @@ export interface LeadRow {
   team_size:      number | null;
   monthly_saving: number | null;
   created_at:     string;
+}
+
+export interface PricingChange {
+  toolKey:  string;
+  tool:     string;
+  planKey:  string;
+  plan:     string;
+  field:    'monthly' | 'annualMonthly' | 'minSeats' | 'plan';
+  previous: number | string | null;
+  current:  number | string | null;
+}
+
+export interface ToolDiff {
+  tool:               string;
+  plan:               string;
+  currentSpend:       number;
+  oldAction:          RecommendedAction;
+  newAction:          RecommendedAction;
+  oldRecommendation?: string;
+  newRecommendation?: string;
+  oldSaving:          number;
+  newSaving:          number;
+  oldReason:          string;
+  newReason:          string;
+  changed:            boolean;
+}
+
+export interface ReauditDiff {
+  auditId:          string;
+  changes:          PricingChange[];
+  toolDiffs:        ToolDiff[];
+  oldMonthlySaving: number;
+  newMonthlySaving: number;
+  monthlyDelta:     number;
+  oldAnnualSaving:  number;
+  newAnnualSaving:  number;
+  annualDelta:      number;
+  hasChanged:       boolean;
 }

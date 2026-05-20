@@ -4,16 +4,18 @@
 // - getBrowserClient(): anon access, safe for browser
 
 import { createClient } from '@supabase/supabase-js';
-import type { AuditInput, AuditResult } from '@/types';
+import type { AuditInput, AuditResult, PricingSnapshot } from '@/types';
 
 // ── Database row types ────────────────────────────────────
 
 export interface AuditRow {
-  id:         string;
-  input:      AuditInput;
-  result:     AuditResult;
-  summary:    string;
-  created_at: string;
+  id:               string;
+  input:            AuditInput;
+  result:           AuditResult;
+  summary:          string;
+  user_email:       string | null;
+  pricing_snapshot: PricingSnapshot | null;
+  created_at:       string;
 }
 
 export interface LeadRow {
